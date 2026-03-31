@@ -14,37 +14,39 @@ export function ChatMessage({ agent, round, isActiveRound }: ChatMessageProps) {
   if (!text) return null;
 
   return (
-    <div
-      className="border-l-2 pl-4 py-3"
-      style={{
-        borderColor: agent.color,
-        background: `linear-gradient(90deg, ${agent.color}08, transparent 40%)`,
-      }}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-1.5">
+    <div className="flex items-start gap-3 max-w-[85%]">
+      {/* Avatar */}
+      <div
+        className="shrink-0 size-8 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: `${agent.color}20` }}
+      >
         <AgentIcon
           name={agent.icon}
           className="size-4"
           style={{ color: agent.color }}
         />
-        <span className="font-semibold text-sm text-white">{agent.name}</span>
-        <span className="text-xs text-white/30">{agent.philosophy}</span>
-        {agent.isStreaming && isActiveRound && (
-          <span
-            className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
-            style={{ backgroundColor: agent.color }}
-          />
-        )}
       </div>
 
-      {/* Content */}
-      <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">
-        {text}
-        {agent.isStreaming && isActiveRound && (
-          <span className="inline-block w-1.5 h-4 ml-0.5 animate-pulse bg-white/50 align-text-bottom" />
-        )}
-      </p>
+      {/* Bubble */}
+      <div className="min-w-0">
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="text-sm font-semibold text-white">{agent.name}</span>
+          {agent.isStreaming && isActiveRound && (
+            <span
+              className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+              style={{ backgroundColor: agent.color }}
+            />
+          )}
+        </div>
+        <div className="rounded-2xl rounded-tl-sm bg-white/[0.06] border border-white/[0.06] px-4 py-3">
+          <p className="text-sm text-white/80 leading-relaxed whitespace-pre-wrap">
+            {text}
+            {agent.isStreaming && isActiveRound && (
+              <span className="inline-block w-1.5 h-4 ml-0.5 animate-pulse bg-white/50 align-text-bottom" />
+            )}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

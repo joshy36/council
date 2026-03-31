@@ -10,6 +10,7 @@ import { ChatMessage } from "@/components/ChatMessage";
 import { RoundDivider } from "@/components/RoundDivider";
 import { VoteMessage } from "@/components/VoteMessage";
 import { VerdictBanner } from "@/components/VerdictBanner";
+import { UserMessage } from "@/components/UserMessage";
 
 export default function SessionPage({
   params,
@@ -88,89 +89,85 @@ export default function SessionPage({
   const hasRound2 = maxRound >= 2;
 
   return (
-    <div className="flex flex-col flex-1 px-4 py-8 md:py-12">
-      <header className="text-center mb-8">
-        <Link href="/" className="inline-block">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
-            The Council
-          </h1>
-        </Link>
-        <p className="text-white/40 text-sm max-w-lg mx-auto">
-          {new Date(session.createdAt).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
-      </header>
+    <div className="flex flex-col flex-1 min-h-0">
+      {/* Chat thread */}
+      <div className="flex-1 overflow-y-auto px-4">
+        <div className="max-w-3xl mx-auto flex flex-col gap-4 py-4">
+          {/* Timestamp */}
+          <div className="text-center">
+            <span className="text-xs text-white/30">
+              {new Date(session.createdAt).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
 
-      {/* Query */}
-      <div className="w-full max-w-3xl mx-auto mb-6">
-        <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-          <p className="text-base text-white/70">{session.query}</p>
+          {/* User query */}
+          <UserMessage text={session.query} />
+
+          {/* Round 1 */}
+          <RoundDivider label="Round 1 — Individual Deliberation" />
+          {agents.map((agent) => (
+            <ChatMessage
+              key={`r1-${agent.id}`}
+              agent={agentStates[agent.id]}
+              round={1}
+              isActiveRound={false}
+            />
+          ))}
+
+          {/* Round 2 */}
+          {hasRound2 && (
+            <>
+              <RoundDivider label="Round 2 — Cross-Examination" />
+              {agents.map((agent) => (
+                <ChatMessage
+                  key={`r2-${agent.id}`}
+                  agent={agentStates[agent.id]}
+                  round={2}
+                  isActiveRound={false}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Votes */}
+          {session.votes.length > 0 && (
+            <>
+              <RoundDivider label="Final Vote" />
+              {agents.map((agent) => (
+                <VoteMessage key={`vote-${agent.id}`} agent={agentStates[agent.id]} />
+              ))}
+            </>
+          )}
+
+          {/* Verdict */}
+          {session.verdict && session.tally && (
+            <VerdictBanner verdict={session.verdict} tally={session.tally} />
+          )}
         </div>
       </div>
 
-      {/* Chat thread */}
-      <div className="w-full max-w-3xl mx-auto flex flex-col gap-3">
-        {/* Round 1 */}
-        <RoundDivider label="Round 1 — Individual Deliberation" />
-        {agents.map((agent) => (
-          <ChatMessage
-            key={`r1-${agent.id}`}
-            agent={agentStates[agent.id]}
-            round={1}
-            isActiveRound={false}
-          />
-        ))}
-
-        {/* Round 2 */}
-        {hasRound2 && (
-          <>
-            <RoundDivider label="Round 2 — Cross-Examination" />
-            {agents.map((agent) => (
-              <ChatMessage
-                key={`r2-${agent.id}`}
-                agent={agentStates[agent.id]}
-                round={2}
-                isActiveRound={false}
-              />
-            ))}
-          </>
-        )}
-
-        {/* Votes */}
-        {session.votes.length > 0 && (
-          <>
-            <RoundDivider label="Final Vote" />
-            {agents.map((agent) => (
-              <VoteMessage key={`vote-${agent.id}`} agent={agentStates[agent.id]} />
-            ))}
-          </>
-        )}
-
-        {/* Verdict */}
-        {session.verdict && session.tally && (
-          <VerdictBanner verdict={session.verdict} tally={session.tally} />
-        )}
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-center gap-6 mt-8">
-        <Link
-          href="/history"
-          className="text-sm text-white/40 hover:text-white/70 transition-colors"
-        >
-          All deliberations
-        </Link>
-        <Link
-          href="/"
-          className="text-sm text-white/40 hover:text-white/70 transition-colors"
-        >
-          New query
-        </Link>
+      {/* Bottom nav */}
+      <div className="shrink-0 border-t border-white/[0.06] px-4 py-3">
+        <div className="flex justify-center gap-6">
+          <Link
+            href="/history"
+            className="text-sm text-white/40 hover:text-white/70 transition-colors"
+          >
+            All deliberations
+          </Link>
+          <Link
+            href="/"
+            className="text-sm text-white/40 hover:text-white/70 transition-colors"
+          >
+            New query
+          </Link>
+        </div>
       </div>
     </div>
   );

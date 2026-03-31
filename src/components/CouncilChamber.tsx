@@ -9,8 +9,10 @@ import { ChatMessage } from "./ChatMessage";
 import { RoundDivider } from "./RoundDivider";
 import { VoteMessage } from "./VoteMessage";
 import { VerdictBanner } from "./VerdictBanner";
+import { UserMessage } from "./UserMessage";
 
 interface CouncilChamberProps {
+  query: string;
   agentStates: Record<AgentId, AgentState>;
   phase: CouncilPhase;
   currentRound: number;
@@ -19,6 +21,7 @@ interface CouncilChamberProps {
 }
 
 export function CouncilChamber({
+  query,
   agentStates,
   phase,
   currentRound,
@@ -45,17 +48,21 @@ export function CouncilChamber({
   const hasRound2 = currentRound >= 2 || agents.some((a) => agentStates[a.id].rounds[2]);
   const hasVotes = agents.some((a) => agentStates[a.id].vote);
 
-  return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Phase indicator */}
-      <PhaseIndicator phase={phase} currentRound={currentRound} />
+  const isActive = phase !== "idle" && phase !== "complete";
 
-      {/* Chat thread */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex flex-col gap-3 mt-4 max-h-[70vh] overflow-y-auto pr-1"
-      >
+  return (
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="flex-1 overflow-y-auto px-4"
+    >
+      <div className="max-w-3xl mx-auto flex flex-col gap-4 py-4">
+        {/* User query as a chat bubble */}
+        <UserMessage text={query} />
+
+        {/* Phase indicator */}
+        {isActive && <PhaseIndicator phase={phase} currentRound={currentRound} />}
+
         {/* Round 1 */}
         <RoundDivider label="Round 1 — Individual Deliberation" />
         {agents.map((agent) => (
@@ -114,16 +121,12 @@ function PhaseIndicator({
     complete: "Council Has Spoken",
   };
 
-  const isActive = phase !== "idle" && phase !== "complete";
-
   return (
-    <div className="flex items-center justify-center gap-2 text-sm text-white/60">
-      {isActive && (
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-        </span>
-      )}
+    <div className="flex items-center justify-center gap-2 text-xs text-white/40 py-1">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+      </span>
       <span>{labels[phase]}</span>
     </div>
   );

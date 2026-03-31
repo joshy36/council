@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { SendHorizonal } from "lucide-react";
 
 interface QueryInputProps {
   onSubmit: (query: string) => void;
@@ -9,6 +10,16 @@ interface QueryInputProps {
 
 export function QueryInput({ onSubmit, disabled }: QueryInputProps) {
   const [query, setQuery] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = `${Math.min(ta.scrollHeight, 150)}px`;
+    }
+  }, [query]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,14 +30,15 @@ export function QueryInput({ onSubmit, disabled }: QueryInputProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
-      <div className="relative">
+      <div className="flex items-end gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition-all focus-within:border-white/20 focus-within:bg-white/[0.07]">
         <textarea
+          ref={textareaRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Present an ethical dilemma to the council..."
+          placeholder="Ask the council an ethical dilemma..."
           disabled={disabled}
-          rows={3}
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-base text-white placeholder-white/30 outline-none transition-all focus:border-white/25 focus:bg-white/[0.07] focus:ring-1 focus:ring-white/25 disabled:opacity-50 resize-none"
+          rows={1}
+          className="flex-1 bg-transparent text-sm text-white placeholder-white/30 outline-none resize-none leading-relaxed max-h-[150px]"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -37,9 +49,9 @@ export function QueryInput({ onSubmit, disabled }: QueryInputProps) {
         <button
           type="submit"
           disabled={disabled || !query.trim()}
-          className="absolute right-3 bottom-3 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-white/10"
+          className="shrink-0 size-8 rounded-lg bg-white/10 flex items-center justify-center text-white/60 transition-all hover:bg-white/20 hover:text-white disabled:opacity-30 disabled:hover:bg-white/10"
         >
-          Convene Council
+          <SendHorizonal className="size-4" />
         </button>
       </div>
     </form>

@@ -37,11 +37,13 @@ export default function RootLayout({
           <TooltipProvider>
             <SidebarProvider defaultOpen={false}>
               <HistorySidebar />
-              <SidebarInset>
-                <header className="flex h-10 items-center px-2">
+              <SidebarInset className="flex flex-col h-dvh">
+                <header className="shrink-0 flex h-10 items-center px-2">
                   <SidebarTrigger className="text-white/40 hover:text-white/70" />
                 </header>
-                {children}
+                <main className="flex flex-col flex-1 min-h-0">
+                  {children}
+                </main>
               </SidebarInset>
             </SidebarProvider>
           </TooltipProvider>
