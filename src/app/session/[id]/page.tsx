@@ -7,6 +7,7 @@ import type { AgentId, Vote } from "@/lib/agents";
 import type { SessionData } from "@/lib/storage";
 import { AgentCard } from "@/components/AgentCard";
 import type { AgentState } from "@/lib/types";
+import { CircleCheck, CircleX } from "lucide-react";
 
 export default function SessionPage({
   params,
@@ -127,8 +128,8 @@ export default function SessionPage({
           className="flex items-center justify-center gap-4 rounded-xl border p-4"
           style={{ backgroundColor: verdictBg, borderColor: verdictBorder }}
         >
-          <span className="text-2xl">
-            {session.verdict === "ethical" ? "✅" : "❌"}
+          <span style={{ color: verdictColor }}>
+            {session.verdict === "ethical" ? <CircleCheck className="size-7" /> : <CircleX className="size-7" />}
           </span>
           <span
             className="text-lg font-bold uppercase tracking-wider"

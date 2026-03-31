@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AgentState } from "@/lib/types";
+import { AgentIcon } from "@/components/AgentIcon";
 
 interface AgentCardProps {
   agent: AgentState;
@@ -31,7 +32,7 @@ export function AgentCard({ agent, activeRound }: AgentCardProps) {
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-        <span className="text-xl">{agent.icon}</span>
+        <AgentIcon name={agent.icon} className="size-5" style={{ color: agent.color }} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm text-white">

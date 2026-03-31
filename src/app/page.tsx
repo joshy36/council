@@ -104,15 +104,6 @@ export default function Home() {
         />
       )}
 
-      {/* History link */}
-      <div className="flex justify-center mt-auto pt-8">
-        <Link
-          href="/history"
-          className="text-xs text-white/25 hover:text-white/50 transition-colors"
-        >
-          Past deliberations
-        </Link>
-      </div>
     </div>
   );
 }

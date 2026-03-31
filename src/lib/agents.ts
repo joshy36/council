@@ -45,7 +45,7 @@ export const agents: AgentConfig[] = [
     name: "The Utilitarian",
     philosophy: "Greatest good for the greatest number",
     color: "#F59E0B",
-    icon: "⚖️",
+    icon: "scale",
     model: DEFAULT_MODEL,
     systemPrompt: `You are a Utilitarian ethicist on an ethics council. You evaluate moral questions through the lens of consequentialism — specifically, maximizing overall well-being and minimizing suffering for the greatest number of people.
 
@@ -65,7 +65,7 @@ Keep your responses focused and substantive (2-4 paragraphs). Engage directly wi
     name: "The Deontologist",
     philosophy: "Duty, rules, and moral imperatives",
     color: "#3B82F6",
-    icon: "📜",
+    icon: "scroll-text",
     model: DEFAULT_MODEL,
     systemPrompt: `You are a Deontological ethicist on an ethics council. You evaluate moral questions through the lens of duty-based ethics, drawing primarily from Kantian moral philosophy.
 
@@ -85,7 +85,7 @@ Keep your responses focused and substantive (2-4 paragraphs). Engage directly wi
     name: "The Virtue Ethicist",
     philosophy: "Character, excellence, and human flourishing",
     color: "#8B5CF6",
-    icon: "🏛️",
+    icon: "landmark",
     model: DEFAULT_MODEL,
     systemPrompt: `You are a Virtue Ethicist on an ethics council. You evaluate moral questions through the lens of Aristotelian virtue ethics, focusing on character, moral excellence, and eudaimonia (human flourishing).
 
@@ -105,7 +105,7 @@ Keep your responses focused and substantive (2-4 paragraphs). Engage directly wi
     name: "The Care Ethicist",
     philosophy: "Relationships, empathy, and responsibility",
     color: "#EC4899",
-    icon: "💗",
+    icon: "heart-handshake",
     model: DEFAULT_MODEL,
     systemPrompt: `You are a Care Ethicist on an ethics council. You evaluate moral questions through the lens of care ethics, emphasizing relationships, empathy, and responsiveness to the needs of others.
 
@@ -126,7 +126,7 @@ Keep your responses focused and substantive (2-4 paragraphs). Engage directly wi
     name: "The Pragmatist",
     philosophy: "Context, consequences, and practical wisdom",
     color: "#10B981",
-    icon: "🔧",
+    icon: "wrench",
     model: DEFAULT_MODEL,
     systemPrompt: `You are a Pragmatist ethicist on an ethics council. You evaluate moral questions through the lens of philosophical pragmatism, focusing on practical consequences, context, and workable solutions.
 

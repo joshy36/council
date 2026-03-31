@@ -1,4 +1,5 @@
 import { streamText, generateText, gateway } from "ai";
+import { cookies } from "next/headers";
 import {
   agents,
   type AgentConfig,
@@ -39,7 +40,16 @@ function encodeSSE(event: CouncilEvent): string {
 }
 
 export async function POST(req: Request) {
-  const { query, model } = (await req.json()) as { query: string; model?: string };
+  const cookieStore = await cookies();
+  const auth = cookieStore.get("council_auth");
+  if (auth?.value !== "authenticated") {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { query, model } = (await req.json()) as {
+    query: string;
+    model?: string;
+  };
 
   if (!query || typeof query !== "string" || query.trim().length === 0) {
     return new Response(JSON.stringify({ error: "Query is required" }), {

@@ -5,6 +5,7 @@ import type { AgentState } from "@/lib/types";
 import type { AgentId, Vote } from "@/lib/agents";
 import type { CouncilPhase } from "@/lib/types";
 import { AgentCard } from "./AgentCard";
+import { CircleCheck, CircleX } from "lucide-react";
 
 interface CouncilChamberProps {
   agentStates: Record<AgentId, AgentState>;
@@ -118,8 +119,8 @@ function VerdictCard({
       className="flex flex-col items-center justify-center rounded-xl border p-6 text-center"
       style={{ backgroundColor: bg, borderColor: border }}
     >
-      <span className="text-4xl mb-3">
-        {verdict === "ethical" ? "✅" : "❌"}
+      <span className="mb-3" style={{ color: textColor }}>
+        {verdict === "ethical" ? <CircleCheck className="size-10" /> : <CircleX className="size-10" />}
       </span>
       <h3
         className="text-lg font-bold uppercase tracking-wider mb-2"
