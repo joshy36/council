@@ -18,6 +18,7 @@ export interface CouncilEvent {
   verdict?: Vote;
   votes?: { agentId: AgentId; vote: Vote; justification: string }[];
   tally?: Record<Vote, number>;
+  sessionId?: string;
 }
 
 export interface AgentState {

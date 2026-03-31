@@ -30,6 +30,7 @@ export function useCouncil() {
   const [currentRound, setCurrentRound] = useState(0);
   const [verdict, setVerdict] = useState<Vote | null>(null);
   const [tally, setTally] = useState<Record<Vote, number> | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -39,10 +40,11 @@ export function useCouncil() {
     setCurrentRound(0);
     setVerdict(null);
     setTally(null);
+    setSessionId(null);
     setError(null);
   }, []);
 
-  const submitQuery = useCallback(async (query: string) => {
+  const submitQuery = useCallback(async (query: string, model?: string) => {
     reset();
     setPhase("deliberating");
     setError(null);
@@ -54,7 +56,7 @@ export function useCouncil() {
       const response = await fetch("/api/council", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, model }),
         signal: controller.signal,
       });
 
@@ -161,6 +163,7 @@ export function useCouncil() {
         setPhase("complete");
         setVerdict(event.verdict!);
         setTally(event.tally!);
+        if (event.sessionId) setSessionId(event.sessionId);
         break;
 
       case "error":
@@ -181,6 +184,7 @@ export function useCouncil() {
     currentRound,
     verdict,
     tally,
+    sessionId,
     error,
     submitQuery,
     cancel,

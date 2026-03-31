@@ -102,15 +102,9 @@ function VoteBadge({ vote, color }: { vote: string; color: string }) {
   const bg =
     vote === "ethical"
       ? "rgba(16,185,129,0.2)"
-      : vote === "unethical"
-        ? "rgba(239,68,68,0.2)"
-        : "rgba(245,158,11,0.2)";
+      : "rgba(239,68,68,0.2)";
   const textColor =
-    vote === "ethical"
-      ? "#10B981"
-      : vote === "unethical"
-        ? "#EF4444"
-        : "#F59E0B";
+    vote === "ethical" ? "#10B981" : "#EF4444";
 
   return (
     <span

@@ -75,7 +75,7 @@ function PhaseIndicator({
       <span>{labels[phase]}</span>
       {isActive && (
         <div className="flex gap-1 ml-2">
-          {[1, 2, 3].map((r) => (
+          {[1, 2].map((r) => (
             <span
               key={r}
               className="h-1.5 w-6 rounded-full transition-colors duration-500"
@@ -105,21 +105,13 @@ function VerdictCard({
   const bg =
     verdict === "ethical"
       ? "rgba(16,185,129,0.08)"
-      : verdict === "unethical"
-        ? "rgba(239,68,68,0.08)"
-        : "rgba(245,158,11,0.08)";
+      : "rgba(239,68,68,0.08)";
   const border =
     verdict === "ethical"
       ? "rgba(16,185,129,0.3)"
-      : verdict === "unethical"
-        ? "rgba(239,68,68,0.3)"
-        : "rgba(245,158,11,0.3)";
+      : "rgba(239,68,68,0.3)";
   const textColor =
-    verdict === "ethical"
-      ? "#10B981"
-      : verdict === "unethical"
-        ? "#EF4444"
-        : "#F59E0B";
+    verdict === "ethical" ? "#10B981" : "#EF4444";
 
   return (
     <div
@@ -127,7 +119,7 @@ function VerdictCard({
       style={{ backgroundColor: bg, borderColor: border }}
     >
       <span className="text-4xl mb-3">
-        {verdict === "ethical" ? "✅" : verdict === "unethical" ? "❌" : "⚖️"}
+        {verdict === "ethical" ? "✅" : "❌"}
       </span>
       <h3
         className="text-lg font-bold uppercase tracking-wider mb-2"
@@ -141,9 +133,6 @@ function VerdictCard({
         </span>
         <span>
           <span className="text-red-400">{tally.unethical}</span> unethical
-        </span>
-        <span>
-          <span className="text-amber-400">{tally.nuanced}</span> nuanced
         </span>
       </div>
     </div>

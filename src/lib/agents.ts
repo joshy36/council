@@ -5,7 +5,7 @@ export type AgentId =
   | "care-ethicist"
   | "pragmatist";
 
-export type Vote = "ethical" | "unethical" | "nuanced";
+export type Vote = "ethical" | "unethical";
 
 export interface AgentConfig {
   id: AgentId;
@@ -17,7 +17,14 @@ export interface AgentConfig {
   systemPrompt: string;
 }
 
-export const DEFAULT_MODEL = "anthropic/claude-sonnet-4-20250514";
+export const DEFAULT_MODEL = "openai/gpt-5-mini";
+
+export const MODEL_OPTIONS = [
+  { id: "openai/gpt-5-mini", name: "GPT-5 Mini", cost: "$" },
+  { id: "anthropic/claude-haiku-4-5-20251001", name: "Claude Haiku 4.5", cost: "$$" },
+  { id: "anthropic/claude-sonnet-4-20250514", name: "Claude Sonnet 4", cost: "$$$" },
+  { id: "anthropic/claude-opus-4-20250514", name: "Claude Opus 4", cost: "$$$$" },
+] as const;
 
 export interface AgentMessage {
   agentId: AgentId;
@@ -185,5 +192,5 @@ ${deliberationHistory}
 
 Now cast your final vote. You must respond in EXACTLY this JSON format and nothing else:
 
-{"vote": "<ethical|unethical|nuanced>", "justification": "<1-2 sentence justification for your vote>"}`;
+{"vote": "<ethical|unethical>", "justification": "<1-2 sentence justification for your vote>"}`;
 }

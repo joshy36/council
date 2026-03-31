@@ -9,6 +9,7 @@ import {
   buildDiscussionPrompt,
   buildVotePrompt,
 } from "@/lib/agents";
+import { saveSession } from "@/lib/storage";
 
 export const maxDuration = 120;
 
@@ -30,6 +31,7 @@ interface CouncilEvent {
   verdict?: Vote;
   votes?: AgentVote[];
   tally?: Record<Vote, number>;
+  sessionId?: string;
 }
 
 function encodeSSE(event: CouncilEvent): string {
@@ -37,7 +39,7 @@ function encodeSSE(event: CouncilEvent): string {
 }
 
 export async function POST(req: Request) {
-  const { query } = (await req.json()) as { query: string };
+  const { query, model } = (await req.json()) as { query: string; model?: string };
 
   if (!query || typeof query !== "string" || query.trim().length === 0) {
     return new Response(JSON.stringify({ error: "Query is required" }), {
@@ -61,17 +63,19 @@ export async function POST(req: Request) {
         await runRound({
           roundNumber: 1,
           agents,
+          modelOverride: model,
           buildPrompt: (agent) => buildDeliberationPrompt(query),
           send,
           roundResponses,
         });
 
-        // === ROUNDS 2-3: Cross-examination ===
-        for (const roundNumber of [2, 3]) {
+        // === ROUND 2: Cross-examination ===
+        for (const roundNumber of [2]) {
           const previousRound = roundResponses[roundNumber - 1];
           await runRound({
             roundNumber,
             agents,
+            modelOverride: model,
             buildPrompt: (agent) => {
               const otherPositions = agents
                 .filter((a) => a.id !== agent.id)
@@ -89,13 +93,12 @@ export async function POST(req: Request) {
 
         // === FINAL VOTE ===
         const deliberationHistory = buildDeliberationHistory(roundResponses);
-        const votes = await collectVotes(query, deliberationHistory, send);
+        const votes = await collectVotes(query, deliberationHistory, send, model);
 
         // Tally and determine verdict
         const tally: Record<Vote, number> = {
           ethical: 0,
           unethical: 0,
-          nuanced: 0,
         };
         for (const v of votes) {
           tally[v.vote]++;
@@ -104,11 +107,30 @@ export async function POST(req: Request) {
           Object.entries(tally) as [Vote, number][]
         ).sort((a, b) => b[1] - a[1])[0][0];
 
+        // Save session to blob storage
+        const sessionId = crypto.randomUUID();
+        try {
+          console.log("[council] Saving session", sessionId);
+          await saveSession({
+            id: sessionId,
+            query,
+            rounds: roundResponses,
+            votes,
+            verdict,
+            tally,
+            createdAt: new Date().toISOString(),
+          });
+          console.log("[council] Session saved successfully", sessionId);
+        } catch (saveErr) {
+          console.error("[council] Failed to save session:", saveErr);
+        }
+
         send({
           type: "council-complete",
           verdict,
           votes,
           tally,
+          sessionId,
         });
 
         controller.close();
@@ -135,12 +157,14 @@ export async function POST(req: Request) {
 async function runRound({
   roundNumber,
   agents: agentConfigs,
+  modelOverride,
   buildPrompt,
   send,
   roundResponses,
 }: {
   roundNumber: number;
   agents: AgentConfig[];
+  modelOverride?: string;
   buildPrompt: (agent: AgentConfig) => string;
   send: (event: CouncilEvent) => void;
   roundResponses: Record<number, Record<AgentId, string>>;
@@ -153,7 +177,7 @@ async function runRound({
 
     let fullText = "";
     const result = streamText({
-      model: gateway(agent.model),
+      model: gateway(modelOverride || agent.model),
       system: agent.systemPrompt,
       prompt: buildPrompt(agent),
     });
@@ -196,11 +220,12 @@ function buildDeliberationHistory(
 async function collectVotes(
   query: string,
   deliberationHistory: string,
-  send: (event: CouncilEvent) => void
+  send: (event: CouncilEvent) => void,
+  modelOverride?: string
 ): Promise<AgentVote[]> {
   const votePromises = agents.map(async (agent) => {
     const result = await generateText({
-      model: gateway(agent.model),
+      model: gateway(modelOverride || agent.model),
       system: agent.systemPrompt,
       prompt: buildVotePrompt(query, deliberationHistory),
     });
@@ -226,13 +251,13 @@ async function collectVotes(
       // Fallback if JSON parsing fails
       const agentVote: AgentVote = {
         agentId: agent.id,
-        vote: "nuanced",
+        vote: "ethical",
         justification: result.text.slice(0, 200),
       };
       send({
         type: "vote",
         agentId: agent.id,
-        vote: "nuanced",
+        vote: "ethical",
         justification: agentVote.justification,
       });
       return agentVote;

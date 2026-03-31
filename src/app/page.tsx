@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { useCouncil } from "@/lib/useCouncil";
+import { DEFAULT_MODEL, MODEL_OPTIONS } from "@/lib/agents";
 import { QueryInput } from "@/components/QueryInput";
 import { CouncilChamber } from "@/components/CouncilChamber";
 
@@ -11,12 +14,14 @@ export default function Home() {
     currentRound,
     verdict,
     tally,
+    sessionId,
     error,
     submitQuery,
     cancel,
     reset,
   } = useCouncil();
 
+  const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL);
   const isActive = phase !== "idle" && phase !== "complete";
 
   return (
@@ -34,7 +39,23 @@ export default function Home() {
 
       {/* Query input */}
       <div className="mb-8">
-        <QueryInput onSubmit={submitQuery} disabled={isActive} />
+        <QueryInput onSubmit={(q) => submitQuery(q, selectedModel)} disabled={isActive} />
+        {/* Model selector */}
+        {!isActive && phase !== "complete" && (
+          <div className="flex justify-center mt-3">
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/60 outline-none focus:border-white/25 cursor-pointer"
+            >
+              {MODEL_OPTIONS.map((m) => (
+                <option key={m.id} value={m.id} className="bg-[#0a0a0f]">
+                  {m.name} ({m.cost})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         {isActive && (
           <div className="flex justify-center mt-3">
             <button
@@ -46,13 +67,21 @@ export default function Home() {
           </div>
         )}
         {phase === "complete" && (
-          <div className="flex justify-center mt-3">
+          <div className="flex justify-center gap-4 mt-3">
             <button
               onClick={reset}
               className="text-xs text-white/30 hover:text-white/60 transition-colors"
             >
               New query
             </button>
+            {sessionId && (
+              <Link
+                href={`/session/${sessionId}`}
+                className="text-xs text-white/30 hover:text-white/60 transition-colors"
+              >
+                Permalink
+              </Link>
+            )}
           </div>
         )}
       </div>
@@ -74,6 +103,16 @@ export default function Home() {
           tally={tally}
         />
       )}
+
+      {/* History link */}
+      <div className="flex justify-center mt-auto pt-8">
+        <Link
+          href="/history"
+          className="text-xs text-white/25 hover:text-white/50 transition-colors"
+        >
+          Past deliberations
+        </Link>
+      </div>
     </div>
   );
 }
