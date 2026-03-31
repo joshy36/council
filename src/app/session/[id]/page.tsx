@@ -3,11 +3,13 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { agents } from "@/lib/agents";
-import type { AgentId, Vote } from "@/lib/agents";
+import type { AgentId } from "@/lib/agents";
 import type { SessionData } from "@/lib/storage";
-import { AgentCard } from "@/components/AgentCard";
 import type { AgentState } from "@/lib/types";
-import { CircleCheck, CircleX } from "lucide-react";
+import { ChatMessage } from "@/components/ChatMessage";
+import { RoundDivider } from "@/components/RoundDivider";
+import { VoteMessage } from "@/components/VoteMessage";
+import { VerdictBanner } from "@/components/VerdictBanner";
 
 export default function SessionPage({
   params,
@@ -83,18 +85,7 @@ export default function SessionPage({
     };
   }
 
-  const verdictColor =
-    session.verdict === "ethical" ? "#10B981" : "#EF4444";
-
-  const verdictBg =
-    session.verdict === "ethical"
-      ? "rgba(16,185,129,0.08)"
-      : "rgba(239,68,68,0.08)";
-
-  const verdictBorder =
-    session.verdict === "ethical"
-      ? "rgba(16,185,129,0.3)"
-      : "rgba(239,68,68,0.3)";
+  const hasRound2 = maxRound >= 2;
 
   return (
     <div className="flex flex-col flex-1 px-4 py-8 md:py-12">
@@ -122,45 +113,48 @@ export default function SessionPage({
         </div>
       </div>
 
-      {/* Verdict summary */}
-      <div className="w-full max-w-3xl mx-auto mb-8">
-        <div
-          className="flex items-center justify-center gap-4 rounded-xl border p-4"
-          style={{ backgroundColor: verdictBg, borderColor: verdictBorder }}
-        >
-          <span style={{ color: verdictColor }}>
-            {session.verdict === "ethical" ? <CircleCheck className="size-7" /> : <CircleX className="size-7" />}
-          </span>
-          <span
-            className="text-lg font-bold uppercase tracking-wider"
-            style={{ color: verdictColor }}
-          >
-            {session.verdict}
-          </span>
-          <div className="flex gap-3 text-sm text-white/50">
-            <span>
-              <span className="text-emerald-400">{session.tally.ethical}</span>{" "}
-              ethical
-            </span>
-            <span>
-              <span className="text-red-400">{session.tally.unethical}</span>{" "}
-              unethical
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* Chat thread */}
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-3">
+        {/* Round 1 */}
+        <RoundDivider label="Round 1 — Individual Deliberation" />
+        {agents.map((agent) => (
+          <ChatMessage
+            key={`r1-${agent.id}`}
+            agent={agentStates[agent.id]}
+            round={1}
+            isActiveRound={false}
+          />
+        ))}
 
-      {/* Agent grid */}
-      <div className="w-full max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agents.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agentStates[agent.id]}
-              activeRound={maxRound}
-            />
-          ))}
-        </div>
+        {/* Round 2 */}
+        {hasRound2 && (
+          <>
+            <RoundDivider label="Round 2 — Cross-Examination" />
+            {agents.map((agent) => (
+              <ChatMessage
+                key={`r2-${agent.id}`}
+                agent={agentStates[agent.id]}
+                round={2}
+                isActiveRound={false}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Votes */}
+        {session.votes.length > 0 && (
+          <>
+            <RoundDivider label="Final Vote" />
+            {agents.map((agent) => (
+              <VoteMessage key={`vote-${agent.id}`} agent={agentStates[agent.id]} />
+            ))}
+          </>
+        )}
+
+        {/* Verdict */}
+        {session.verdict && session.tally && (
+          <VerdictBanner verdict={session.verdict} tally={session.tally} />
+        )}
       </div>
 
       {/* Navigation */}
