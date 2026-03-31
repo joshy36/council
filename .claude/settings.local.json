@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(find /Users/joshuabender/council/node_modules/ai/docs/04-ai-sdk-ui -name \"*.mdx\" -exec basename {})",
+      "Bash(npx next:*)",
+      "WebSearch",
+      "Skill(update-config)",
+      "Bash(git add:*)"
+    ]
+  }
+}
